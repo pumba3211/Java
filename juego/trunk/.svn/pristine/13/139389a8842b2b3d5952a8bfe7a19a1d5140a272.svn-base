@@ -1,0 +1,574 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package segundoproyectodiegoronald;
+
+import java.awt.Button;
+import java.awt.Color;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+
+/**
+ *
+ * @author Diego a
+ */
+public class Tablero extends javax.swing.JFrame {
+
+    Jugador jugador;
+    int f;
+    int c;
+    private Dulce[][] dulce;
+    private JButton[][] boton;
+    private String[] location1;
+    private String[] location2;
+    boolean marcado = false;
+    String aux1;
+    String aux2;
+    String btn1;
+    String btn1_1;
+    String btn2;
+    String btn2_2;
+    String color1;
+    String color2;
+    String aux;
+
+    public boolean comprobarColor(int colorDulce, int i, int j) {
+        boolean asignarColor = true; //true: color se queda, false: hay que calcular otro color
+
+        if (i - 1 >= 0) { //Revisa si existe la fila menos uno
+            //Revisa si el dulce en la fila menos uno es igual al dulce calculado
+            if (this.dulce[i - 1][j].getNumero() == colorDulce) {
+                //Revisa si existe la fila menos dos
+                if (i - 2 >= 0) {
+                    //Revisa si el dulce de la fila menos dos es igual al dulce calculado
+                    if (this.dulce[i - 2][j].getNumero() == colorDulce) {
+                        /**
+                         * Devuelve la variable falsa para que se tenga que
+                         * calcular un nuevo color.
+                         */
+                        asignarColor = false;
+                    }
+                }
+            }
+        }
+        /**
+         * Nota: Si ninguna de estas condiciones se cumple significa que el
+         * color es correcto y se puede quedar en esa poscisión, por lo tanto el
+         * método retorna en verdadero y no entra en el ciclo.
+         */
+        if (j - 1 >= 0) {
+            if (this.dulce[i][j - 1].getNumero() == colorDulce) {
+                if (j - 2 >= 0) {
+                    if (this.dulce[i][j - 2].getNumero() == colorDulce) {
+                        asignarColor = false;
+                    }
+                }
+            }
+        }
+        return (asignarColor);
+    }
+
+    public void jugar() {
+        if (jugador.getNivel() == 1) {
+            this.f = 5;
+            this.c = 8;
+        } else if (jugador.getNivel() == 2) {
+            this.f = 9;
+            this.c = 9;
+        } else if (jugador.getNivel() == 3) {
+            this.f = 7;
+            this.c = 7;
+        }
+        boton = new JButton[f][c];
+        dulce = new Dulce[f][c];
+        crearDulces();
+    }
+
+    /**
+     * Creates new form Ventana
+     */
+    public void crearDulces() {
+        int num = 0;
+        //Ciclo que recorre las filas de la matriz
+        for (int i = 0; i < dulce.length; i++) {
+            //Ciclo que recorre las columnas de la matriz
+            for (int j = 0; j < dulce[i].length; j++) {
+                //Crea un nuevo dulce
+                Dulce dul = new Dulce();
+                //Calcula un color de dulce aleatorio
+                num = dul.numero();
+                while (!comprobarColor(num, i, j)) {
+                    num = dul.numero();
+                }
+                dul.setNumero(num);
+                dulce[i][j] = dul;
+            }
+        }
+
+        crearBotones();
+    }
+
+    public void crearBotones() {
+        String text = "";
+        for (int i = 0; i < boton.length; i++) {
+            for (int j = 0; j < boton[i].length; j++) {
+                //-------------------------------agrega nuevo boton-------------------
+
+                boton[i][j] = new JButton();
+                text = String.valueOf("C") + "-" + String.valueOf("F");
+                boton[i][j].setBounds((50 * i), (50 * j), 50, 50);
+                boton[i][j].setActionCommand(text);
+                boton[i][j].setText(text);
+
+
+                //-----------------------------agregar evento a los botones-------------
+                boton[i][j].addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent evt) {
+                        JButton evento = (JButton) evt.getSource();
+                        if (marcado) {
+                            aux2 = evento.getActionCommand();
+                            location2 = aux2.split("-");
+                            btn2 = location2[0];
+                            btn2_2 = location2[1];
+
+                            //JOptionPane.showMessageDialog(null, "peeec \n Se apreto el boton " +btn2);
+                        } else {
+                            aux1 = evento.getActionCommand();
+                            marcado = true;
+                            location1 = aux1.split("-");
+                            btn1 = location1[0];
+                            btn1_1 = location1[1];
+                            //JOptionPane.showMessageDialog(null, "Se apreto el boton " +btn1);
+
+                        }
+                    }
+                });
+                //---------------------------termina de agregar evento-----------------
+
+
+                //---------------------------asigna color tipo dulce a los botones------
+
+                if (dulce[i][j].getColor().equals("Rojo")) {
+                    boton[i][j].setBackground(Color.red);
+                } else if (dulce[i][j].getColor().equals("Naranja")) {
+                    boton[i][j].setBackground(Color.orange);
+                } else if (dulce[i][j].getColor().equals("Amarillo")) {
+                    boton[i][j].setBackground(Color.yellow);
+                } else if (dulce[i][j].getColor().equals("Verde")) {
+                    boton[i][j].setBackground(Color.green);
+                } else if (dulce[i][j].getColor().equals("Azul")) {
+                    boton[i][j].setBackground(Color.blue);
+                } else if (dulce[i][j].getColor().equals("Morado")) {
+                    boton[i][j].setBackground(Color.magenta);
+                }
+                this.panel.add(boton[i][j]);
+            }
+        }
+    }
+
+    public void cambiarColor() {
+        /**
+         * validar si el los botones estar arriba abajo izq o derecha
+         */
+        int no = 0;
+        if (Integer.parseInt(btn1) == (Integer.parseInt(btn2) - 1)) {
+            JOptionPane.showMessageDialog(menu, "Movimiento hacia la derecha");
+        } else if (Integer.parseInt(btn2) == (Integer.parseInt(btn1) - 1)) {
+            JOptionPane.showMessageDialog(menu, "Movimiento hacia la izquierda");
+        } else if (Integer.parseInt(btn2_2) == (Integer.parseInt(btn1_1) - 1)) {
+            JOptionPane.showMessageDialog(menu, "Movimiento hacia la arriba");
+        } else if (Integer.parseInt(btn2_2) == (Integer.parseInt(btn1_1) + 1)) {
+            JOptionPane.showMessageDialog(menu, "Movimiento hacia la abajo");
+        } else {
+            JOptionPane.showMessageDialog(menu, "Movimiento no valido");
+            no = 1;
+        }
+        if (no <= 0) {
+            /**
+             * if para saber si fue el boton dos el primero en seleccionarse o si fue 
+             * el numero uno 
+             */
+
+            if (Integer.parseInt(btn2) < (Integer.parseInt(btn1)) || Integer.parseInt(btn2_2) < (Integer.parseInt(btn1_1))) {
+                int contador = 0;
+                for (int i = 0; i < dulce.length; i++) {
+                    for (int j = 0; j < dulce[i].length; j++) {
+                        if (dulce[i][j] == dulce[Integer.parseInt(location2[0])][Integer.parseInt(location2[1])]) {
+                            String color2 = dulce[j][i].getColor();
+                            contador += 1;
+                            
+                        }
+                        if (dulce[j][i] == dulce[Integer.parseInt(location1[0])][Integer.parseInt(location1[1])]) {
+                            String color1 = dulce[j][i].getColor();
+                            contador += 1;
+                            String aux = color1;
+                            color1 = color2;
+                            color2 = aux;
+                            dulce[Integer.parseInt(location1[0])][Integer.parseInt(location1[1])].setColor(color1);
+                            dulce[Integer.parseInt(location2[0])][Integer.parseInt(location2[1])].setColor(aux);
+
+                        }
+
+                    }
+
+                }
+            } else {
+                int contador = 0;
+                for (int i = 0; i < dulce.length; i++) {
+                    for (int j = 0; j < dulce[i].length; j++) {
+                        if (dulce[j][i] == dulce[Integer.parseInt(location1[0])][Integer.parseInt(location1[1])]) {
+                            String color1 = dulce[j][i].getColor();
+                            contador += 1;
+
+                        }
+                        if (dulce[j][i] == dulce[Integer.parseInt(location2[0])][Integer.parseInt(location2[1])]) {
+                            String color2 = dulce[j][i].getColor();
+                            contador += 1;
+                            String aux = color1;
+                            color1 = color2;
+                            color2 = aux;
+                            dulce[Integer.parseInt(location1[0])][Integer.parseInt(location1[1])].setColor(color1);
+                            dulce[Integer.parseInt(location2[0])][Integer.parseInt(location2[1])].setColor(aux);
+                        }
+                    }
+
+                }
+            }
+
+
+        }
+        //limipia todo para poder hacer otro movimiento sin que se caiga XD!
+        marcado = false;
+        aux2 = "";
+        aux1 = "";
+        btn2 = "";
+        btn2_2 = "";
+        btn1 = "";
+        btn1_1 = "";
+//        for (int i = 0; i < dulce.length; i++) {
+//            for (int j = 0; j < dulce[i].length; j++) {
+//                //dulce[Integer.parseInt(location1[0])][Integer.parseInt(location1[1])].getColor();
+//                
+//            }
+//            
+//        }
+    }
+
+    public Tablero() {
+        initComponents();
+        jugador = new Jugador();
+        if (jugador.getNivel() == 1) {
+            this.f = 5;
+            this.c = 8;
+        } else if (jugador.getNivel() == 2) {
+            this.f = 9;
+            this.c = 9;
+        } else if (jugador.getNivel() == 3) {
+            this.f = 7;
+            this.c = 7;
+        }
+        boton = new JButton[f][c];
+        dulce = new Dulce[f][c];
+        crearDulces();
+        crearBotones();
+        menPuntos.setText(String.valueOf(jugador.getPuntos()));
+        menVidas.setText(String.valueOf(jugador.getCantVidas()));
+        menMov.setText(String.valueOf(jugador.getMovimientos()));
+        menNiv.setText(String.valueOf(jugador.getNivel()));
+
+
+        this.setLocationRelativeTo(null);//centra el formulario.
+        //this.setExtendedState(this.MAXIMIZED_BOTH);
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        panel = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
+        menu = new javax.swing.JMenuBar();
+        jMenu2 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem3 = new javax.swing.JMenuItem();
+        jMenu3 = new javax.swing.JMenu();
+        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenu1 = new javax.swing.JMenu();
+        jMenuItem4 = new javax.swing.JMenuItem();
+        jMenu4 = new javax.swing.JMenu();
+        jMenu9 = new javax.swing.JMenu();
+        jMenu6 = new javax.swing.JMenu();
+        menVidas = new javax.swing.JMenu();
+        jMenu10 = new javax.swing.JMenu();
+        jMenu8 = new javax.swing.JMenu();
+        menNiv = new javax.swing.JMenu();
+        jMenu11 = new javax.swing.JMenu();
+        jMenu7 = new javax.swing.JMenu();
+        menMov = new javax.swing.JMenu();
+        jMenu12 = new javax.swing.JMenu();
+        jMenu5 = new javax.swing.JMenu();
+        menPuntos = new javax.swing.JMenu();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Juego");
+        setFocusableWindowState(false);
+
+        javax.swing.GroupLayout panelLayout = new javax.swing.GroupLayout(panel);
+        panel.setLayout(panelLayout);
+        panelLayout.setHorizontalGroup(
+            panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 563, Short.MAX_VALUE)
+        );
+        panelLayout.setVerticalGroup(
+            panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
+        jButton1.setText("jButton1");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        menu.setPreferredSize(new java.awt.Dimension(296, 40));
+
+        jMenu2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Recursos/1374477120_user.png"))); // NOI18N
+        jMenu2.setText("Jugador");
+
+        jMenuItem1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Recursos/1374474892_user-group-new.png"))); // NOI18N
+        jMenuItem1.setText("Ingresar Jugador");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem1);
+
+        jMenuItem3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Recursos/1374475143_Add-Male-User.png"))); // NOI18N
+        jMenuItem3.setText("Jugar Rapido");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem3);
+
+        menu.add(jMenu2);
+
+        jMenu3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Recursos/1374476923_game_pad.png"))); // NOI18N
+        jMenu3.setText("Jugar");
+
+        jMenuItem2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Recursos/1374476142_preferences-desktop-gaming.png"))); // NOI18N
+        jMenuItem2.setText("Jugar");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenu3.add(jMenuItem2);
+
+        menu.add(jMenu3);
+
+        jMenu1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Recursos/1374477072_list_num.png"))); // NOI18N
+        jMenu1.setText("Puntuación");
+
+        jMenuItem4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Recursos/1374476691_gnome-mime-application-vnd.lotus-1-2-3.png"))); // NOI18N
+        jMenuItem4.setText("Ver Puntuación");
+        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem4ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem4);
+
+        menu.add(jMenu1);
+
+        jMenu4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Recursos/1374476944_delete.png"))); // NOI18N
+        jMenu4.setText("Salir");
+        jMenu4.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jMenu4MouseClicked(evt);
+            }
+        });
+        menu.add(jMenu4);
+
+        jMenu9.setText("|");
+        jMenu9.setEnabled(false);
+        jMenu9.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        menu.add(jMenu9);
+
+        jMenu6.setText("Vidas:");
+        jMenu6.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jMenu6.setName(""); // NOI18N
+        menu.add(jMenu6);
+
+        menVidas.setName(""); // NOI18N
+        menu.add(menVidas);
+
+        jMenu10.setText("|");
+        jMenu10.setEnabled(false);
+        jMenu10.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        menu.add(jMenu10);
+
+        jMenu8.setText("Nivel:");
+        jMenu8.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        menu.add(jMenu8);
+
+        menNiv.setName(""); // NOI18N
+        menu.add(menNiv);
+
+        jMenu11.setText("|");
+        jMenu11.setEnabled(false);
+        jMenu11.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        menu.add(jMenu11);
+
+        jMenu7.setText("Movimientos:");
+        jMenu7.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        menu.add(jMenu7);
+
+        menMov.setName("peec"); // NOI18N
+        menu.add(menMov);
+
+        jMenu12.setText("|");
+        jMenu12.setEnabled(false);
+        jMenu12.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        menu.add(jMenu12);
+
+        jMenu5.setText("Puntos:");
+        jMenu5.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        menu.add(jMenu5);
+        menu.add(menPuntos);
+
+        setJMenuBar(menu);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(panel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(jButton1)
+                .addContainerGap())
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(24, 24, 24)
+                .addComponent(jButton1)
+                .addContainerGap(434, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(panel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void jMenu4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu4MouseClicked
+        // TODO add your handling code here:
+        System.exit(0);
+    }//GEN-LAST:event_jMenu4MouseClicked
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        // TODO add your handling code here:
+        String nombre;
+        nombre = JOptionPane.showInputDialog("Ingrese el nombre del jugador");
+        jugador.setNombre(nombre);
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        // TODO add your handling code here:
+        jugador.setNombre("Player");
+        f = 9;
+        c = 9;
+        crearDulces();
+        crearBotones();
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItem4ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        cambiarColor();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(Tablero.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(Tablero.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(Tablero.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(Tablero.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new Tablero().setVisible(true);
+            }
+        });
+    }
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu10;
+    private javax.swing.JMenu jMenu11;
+    private javax.swing.JMenu jMenu12;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenu jMenu4;
+    private javax.swing.JMenu jMenu5;
+    private javax.swing.JMenu jMenu6;
+    private javax.swing.JMenu jMenu7;
+    private javax.swing.JMenu jMenu8;
+    private javax.swing.JMenu jMenu9;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenuItem jMenuItem4;
+    private javax.swing.JMenu menMov;
+    private javax.swing.JMenu menNiv;
+    private javax.swing.JMenu menPuntos;
+    private javax.swing.JMenu menVidas;
+    private javax.swing.JMenuBar menu;
+    private javax.swing.JPanel panel;
+    // End of variables declaration//GEN-END:variables
+}

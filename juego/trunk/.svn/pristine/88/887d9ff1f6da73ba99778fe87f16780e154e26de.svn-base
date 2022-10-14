@@ -1,0 +1,18 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package segundoproyectodiegoronald;
+
+/**
+ *
+ * @author Diego
+ */
+public class Jugador {
+    private String nombre;//atributo que contiene el nombre del jugador.
+    private int cantVidas=0;//atributo que contiene la cantidad de vidas del jugador.
+    private int nivel=0;//atributo que contiene el nivel por el cual va el jugador.
+    private double puntos=0;//atributo que contiene la cantidad de puntos del jugador.
+    private int movimientos=0;//atributo que contiene la cantidad de movimientos.
+    
+}

@@ -1,0 +1,24 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package segundoproyectodiegoronald;
+
+import javax.swing.JOptionPane;
+
+/**
+ *
+ * @author Diego Arrieta y Ronald Acuña
+ */
+public class SegundoProyectoDiegoRonald {
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        // TODO code application logic here
+        JOptionPane.showMessageDialog(null, "Esto es una prueba de que funciona");
+        JOptionPane.showMessageDialog(null, "Esto es una prueba de que funciona numero dos");
+        JOptionPane.showMessageDialog(null, "parece que si puede?");
+    }
+}

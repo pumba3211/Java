@@ -1,0 +1,14 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package segundoproyectodiegoronald;
+
+/**
+ *
+ * @author Diego
+ */
+public class Dulce {
+    private String color;
+    private int tipo=0;
+}
